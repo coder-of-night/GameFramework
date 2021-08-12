@@ -1,0 +1,28 @@
+{
+  "panelInfoList": [
+    {
+      "panelTypeString": "LoadPanel",
+      "path": "UIPanel/LoadPanel"
+    },
+    {
+      "panelTypeString": "MainPanel",
+      "path": "UIPanel/MainPanel"
+    },
+    {
+      "panelTypeString": "ReadyPopup",
+      "path": "UIPanel/ReadyPopup"
+    },
+    {
+      "panelTypeString": "SettingPanel",
+      "path": "UIPanel/SettingPanel"
+    },
+    {
+      "panelTypeString": "WinPanel",
+      "path": "UIPanel/WinPanel"
+    },
+    {
+      "panelTypeString": "FailPanel",
+      "path": "UIPanel/FailPanel"
+    }
+  ]
+}
