@@ -9,17 +9,28 @@ AB加载卸载
 
 #Await#
 异步编程实现的语句级阻塞
-Case: 
+
+Case:
+
 void Function()
 {
+
 ...........
+
 await CustomAwaiter.WaitForAction(DoXXX);
+
 //3秒后才继续下面语句。
+
 ..........
+
 }
+
 void DoXXX(CustomAwaiter awaiter)
+
 {
-    TODO:
+
+    ..........
+    
     等待3秒 => awaiter.Complete();
 }
 
@@ -56,7 +67,10 @@ void DoXXX(CustomAwaiter awaiter)
 
 #Timer#
 定时器，效仿Dotween，使用Linq语句方便实现延时回调。
-Case: Timer.S.DoWait(3).OnUpdate(()=>{todo per frame}).OnComplete(()=>{todo while complete}).BindTarget(lifetimeObject);
+
+Case: 
+
+Timer.S.DoWait(3).OnUpdate(()=>{todo per frame}).OnComplete(()=>{todo while complete}).BindTarget(lifetimeObject);
 
 #Tools#
 工具类
