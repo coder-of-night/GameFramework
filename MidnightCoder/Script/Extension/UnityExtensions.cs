@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
-
+using UnityEngine.UI;
 public static class TransformExtensions
 {
     public static Vector3 SetPosX(this Transform transform, float value)
@@ -111,7 +112,14 @@ public static class TransformExtensions
         transform.localScale = newScale;
         return newScale;
     }
+    public static RectTransform rectTransform(this MonoBehaviour script)
+    {
+        return script.GetComponent<RectTransform>();
+    }
 
+    /// <summary>
+    /// Tip:只查一级
+    /// </summary>
     public static GameObject FindWithSubString(this Transform transform, string name, bool ignoreCase = false)
     {
         for (int i = 0; i < transform.childCount; i++)
@@ -128,6 +136,27 @@ public static class TransformExtensions
             }
         }
         return null;
+    }
+    /// <summary>
+    /// Tip:只查一级
+    /// </summary>
+    public static List<GameObject> FindsWithSubString(this Transform transform, string name, bool ignoreCase = false)
+    {
+        List<GameObject> objs = new List<GameObject>();
+        for (int i = 0; i < transform.childCount; i++)
+        {
+            Transform child = transform.GetChild(i);
+            if (child != null)
+            {
+                string childName = ignoreCase ? child.name.ToLower() : transform.name;
+                string compareName = ignoreCase ? name.ToLower() : name;
+                if (childName.Contains(compareName))
+                {
+                    objs.Add(child.gameObject);
+                }
+            }
+        }
+        return objs;
     }
 }
 
@@ -152,4 +181,23 @@ public static class DictionaryExtensions
         }
         return key;
     }
+
+    /// <summary>
+    /// 可覆盖现有值
+    /// </summary>
+    /// <returns>如果存在Key就返回true，并且覆盖其值</returns>
+    public static bool AddAndCover<TKey, TValue>(this Dictionary<TKey, TValue> dict, TKey key,TValue value)
+    {
+        bool flag = dict.ContainsKey(key);
+        if (flag)
+        {
+            dict[key] = value;
+        }
+        else
+        {
+            dict.Add(key, value);
+        }
+        return flag;
+    }
+
 }

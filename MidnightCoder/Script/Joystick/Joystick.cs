@@ -17,9 +17,11 @@ public class Joystick : MonoBehaviour
 
     [SerializeField, Title("摇杆类型"), Tooltip("定死的还是随触摸位置变化的")]
     private JoystickType joystickType = JoystickType.FOLLOW;
+    [SerializeField, Title("操作类型"), Tooltip("常规摇杆逻辑还是左右迅速给出反应")]
+    private RectType rectType = RectType.Normal;
 
-  //  [SerializeField, Title("方向限制"), Tooltip("万向,四向,八向")]
-  //  private DirectionType directionType = DirectionType.ALL;
+    //  [SerializeField, Title("方向限制"), Tooltip("万向,四向,八向")]
+    //  private DirectionType directionType = DirectionType.ALL;
     [SerializeField, Header("摇杆死角"), Range(0, 1)]
     private float deathArea = 0;
 
@@ -36,7 +38,7 @@ public class Joystick : MonoBehaviour
     private bool isStartFromUI = false; //是否一开始就点在UI上，如果是那么无论怎么滑都不应该再响应摇杆逻辑了
     void Awake()
     {
-       // this.uiRoot = UIManager.S.GetComponent<RectTransform>();
+        // this.uiRoot = UIManager.S.GetComponent<RectTransform>();
         this.uiCamera = UIManager.S.GetComponent<Canvas>().worldCamera;
         this.cg = GetComponent<CanvasGroup>();
         this._radius = this.ring.rect.width / 2;
@@ -56,7 +58,6 @@ public class Joystick : MonoBehaviour
                 isStartFromUI = true;
                 return;
             }
-            EventSystem.S.Send(EventID.OnGetInputState, true);
             this._touchStartEvent();
         }
         if (!isStartFromUI && Input.GetMouseButton(0))
@@ -67,7 +68,6 @@ public class Joystick : MonoBehaviour
         if (Input.GetMouseButtonUp(0))
         {
             isStartFromUI = false;
-            EventSystem.S.Send(EventID.OnGetInputState, false);
             this._touchEndEvent();
         }
 
@@ -100,7 +100,7 @@ public class Joystick : MonoBehaviour
 
             // 记录摇杆位置，给 touch move 使用
             this._stickPos = touchPos;
-            this.cg.alpha = 1;
+            this.cg.alpha = 0;
             this._touchLocation = touchPos;
 
             // 更改摇杆的位置
@@ -121,44 +121,58 @@ public class Joystick : MonoBehaviour
         Vector2 mousePos;
         RectTransformUtility.ScreenPointToLocalPointInRectangle(this.GetComponent<RectTransform>(),
             Input.mousePosition, uiCamera, out mousePos);
-        if (this.joystickType == JoystickType.FOLLOW)
+        if (rectType == RectType.Normal)
         {
-            // 如果 touch start 位置和 touch move 在摇杆死角区域内，禁止移动
-            if (_touchLocation.Equals(mousePos))
+            //if (this.joystickType == JoystickType.FOLLOW)
+            //{
+            //    // 如果 touch start 位置和 touch move 在摇杆死角区域内，禁止移动
+            //    if (_touchLocation.Equals(mousePos))
+            //    {
+            //        return;
+            //    }
+            //}
+            // 以圆圈为锚点获取触摸坐标
+            Vector3 touchPos = mousePos - this.ring.anchoredPosition;
+            float distance = touchPos.magnitude;
+            // 由于摇杆的 postion 是以父节点为锚点，所以定位要加上 touch start 时的位置
+            float posX = this._stickPos.x + touchPos.x;
+            float posY = this._stickPos.y + touchPos.y;
+
+            // 归一化
+            Vector2 d = new Vector2(posX, posY) - this.ring.anchoredPosition;
+            Vector2 p = d.normalized;
+
+            if (this._radius > distance)
             {
-                return;
+                this.dot.anchoredPosition = new Vector2(posX, posY);
+                // this.UpdatePlayerInput(SpeedType.NORMAL, p);
             }
-        }
+            else
+            {
+                // 控杆永远保持在圈内，并在圈内跟随触摸更新角度
+                float x = this._stickPos.x + p.x * this._radius;
+                float y = this._stickPos.y + p.y * this._radius;
+                this.dot.anchoredPosition = new Vector2(x, y);
+                // this.UpdatePlayerInput(SpeedType.FAST, p);
+            }
 
-        // 以圆圈为锚点获取触摸坐标
-        Vector3 touchPos = mousePos - this.ring.anchoredPosition;
-        float distance = touchPos.magnitude;
-        // 由于摇杆的 postion 是以父节点为锚点，所以定位要加上 touch start 时的位置
-        float posX = this._stickPos.x + touchPos.x;
-        float posY = this._stickPos.y + touchPos.y;
-
-        // 归一化
-        Vector2 d = new Vector2(posX, posY) - this.ring.anchoredPosition;
-        Vector2 p = d.normalized;
-
-        if (this._radius > distance)
-        {
-            this.dot.anchoredPosition = new Vector2(posX, posY);
-            // this.UpdatePlayerInput(SpeedType.NORMAL, p);
+            if (this.player == null) return;
+            //  if (IsInDeathArea()) return;
+            this.UpdatePlayerInput(SpeedType.FAST, p * Mathf.Clamp(d.magnitude / _radius, 0, 1));
         }
         else
         {
-            // 控杆永远保持在圈内，并在圈内跟随触摸更新角度
-            float x = this._stickPos.x + p.x * this._radius;
-            float y = this._stickPos.y + p.y * this._radius;
-            this.dot.anchoredPosition = new Vector2(x, y);
-            // this.UpdatePlayerInput(SpeedType.FAST, p);
+            Vector2 d = (mousePos - _touchLocation);
+            d.x = Mathf.Clamp(d.x, -40, 40);
+            if (Mathf.Abs(d.x ) < 2)
+            {
+                d.x = 0;
+            }
+            if (this.player == null) return;
+            this.UpdatePlayerInput(SpeedType.FAST, d);
+            _touchLocation = mousePos;
         }
-
-        if (this.player == null) return;
-        //  if (IsInDeathArea()) return;
-
-        this.UpdatePlayerInput(SpeedType.FAST, p * Mathf.Clamp(d.magnitude / _radius, 0, 1));
+     
     }
 
     private void _touchEndEvent()

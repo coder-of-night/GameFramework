@@ -15,3 +15,9 @@ public enum SpeedType
     NORMAL = 1,
     FAST = 2
 }
+public enum RectType
+{
+    Normal,
+    Immediately
+}
+

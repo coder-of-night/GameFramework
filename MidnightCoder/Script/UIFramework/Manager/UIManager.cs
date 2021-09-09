@@ -34,7 +34,6 @@ public class UIManager : TMonoSingleton<UIManager>
         panelObjectDict = new Dictionary<UIPanelType, BasePanel>();
         panelList = new LinkedList<BasePanel>();
         panelRelativeDict = new Dictionary<UIPanelType, List<UIPanelType>>();
-        panelRelativeDict.Add(UIPanelType.MainPanel, new List<UIPanelType>() { UIPanelType.ReadyPopup });
         this.ParseUIPanelTypeJson();
     }
     /*----------------------------------分割线--------------------------------------*/

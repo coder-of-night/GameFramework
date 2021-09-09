@@ -46,4 +46,14 @@ public class CustomAwaiter : INotifyCompletion
         act(awaiter);
         return awaiter;
     }
+    /// <summary>
+    /// 可等待的方法,带一个参数
+    /// </summary>
+    /// <returns></returns>
+    public static CustomAwaiter WaitForAction<T>(Action<CustomAwaiter, T> act, T param)
+    {
+        var awaiter = new CustomAwaiter();
+        act(awaiter, param);
+        return awaiter;
+    }
 }

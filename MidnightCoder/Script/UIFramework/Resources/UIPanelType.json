@@ -9,8 +9,8 @@
       "path": "UIPanel/MainPanel"
     },
     {
-      "panelTypeString": "ReadyPopup",
-      "path": "UIPanel/ReadyPopup"
+      "panelTypeString": "TalkPanel",
+      "path": "UIPanel/TalkPanel"
     },
     {
       "panelTypeString": "SettingPanel",
